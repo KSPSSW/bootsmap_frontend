@@ -14,6 +14,11 @@
       </q-card-section>
 
       <q-card-section>
+        <!-- <q-btn
+            :color="showLowStock ? 'negative' : 'grey'"
+            :label="showLowStock ? 'All Items' : 'Low Stock'"
+            @click="toggleLowStock"
+          /> -->
         <q-table :rows="stockItems" :columns="columns" row-key="code" dense flat>
           <template v-slot:body-cell-actualQty="props">
             <q-input
@@ -62,6 +67,7 @@ export default defineComponent({
     const stockId = Number(route.params.id)
     const router = useRouter()
     const stockItems = ref<InventoryItems[]>([])
+    // const showLowStock = ref(false)
 
     const goBackToStockPage = () => {
       router.push({ name: 'StockPage' })
@@ -86,7 +92,6 @@ export default defineComponent({
     const columns: QTableColumn[] = [
       { name: 'id', label: 'ID', field: 'id', align: 'left' },
       { name: 'name', label: 'ชื่อสินค้า', field: 'name', align: 'left' },
-      { name: 'category', label: 'หมวดหมู่', field: 'category.name', align: 'left' }, // ดึง category.name
       { name: 'quantity', label: 'จำนวน', field: 'quantity', align: 'right' },
       { name: 'unit', label: 'หน่วย', field: 'unit', align: 'left' },
       { name: 'minStock', label: 'สต็อกขั้นต่ำ', field: 'minStock', align: 'right' },
@@ -132,6 +137,10 @@ export default defineComponent({
         console.error('ไม่สามารถโหลดข้อมูลจาก API ได้', err)
       }
     }
+
+    //     function toggleLowStock() {
+    //       showLowStock.value = !showLowStock.value
+    // }
 
     return {
       stockDetail,

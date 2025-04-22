@@ -55,6 +55,19 @@
         <q-btn label="รีเฟรช" color="secondary" class="q-mb-md" @click="loadStockHistory" />
       </q-card-section>
       <q-table :rows="filteredChecks" :columns="columns" row-key="id" class="q-pa-sm">
+        <template v-slot:body-cell-status="props">
+          <q-td :props="props" align="center">
+            <!-- ใช้ align="center" เพื่อจัดตำแหน่ง -->
+            <q-chip
+              :color="getStatusColor(props.row.status).color"
+              :text-color="getStatusColor(props.row.status).textColor"
+              :label="props.row.status"
+              class="q-mb-xs"
+            />
+          </q-td>
+        </template>
+
+        <!-- คอลัมน์ปุ่มดูรายละเอียด -->
         <template v-slot:body-cell-actions="props">
           <q-btn label="ดูรายละเอียด" color="info" @click="viewDetails(props.row.id)" flat />
         </template>
@@ -98,10 +111,10 @@ export default defineComponent({
     ]
 
     const columns: QTableColumn[] = [
-      { name: 'date', label: 'วันที่', align: 'left', field: 'date' },
-      { name: 'checker', label: 'ผู้ตรวจสอบ', align: 'left', field: 'checker' },
+      { name: 'date', label: 'วันที่', align: 'center', field: 'date' },
+      { name: 'checker', label: 'ผู้ตรวจสอบ', align: 'center', field: 'checker' },
       { name: 'status', label: 'สถานะ', align: 'center', field: 'status' },
-      { name: 'note', label: 'หมายเหตุ', align: 'left', field: 'note' },
+      { name: 'note', label: 'หมายเหตุ', align: 'center', field: 'note' },
       { name: 'actions', label: '', align: 'center', field: 'actions' },
     ]
 
@@ -126,6 +139,17 @@ export default defineComponent({
 
     const filteredChecks = computed(() => stockStore.loadStockHistory())
 
+    // กำหนดประเภทของผลลัพธ์ให้ชัดเจน
+    const getStatusColor = (status: string): { color: string; textColor: string } => {
+      if (status === 'กำลังดำเนินการ') {
+        return { color: 'yellow', textColor: 'black' }
+      } else if (status === 'เสร็จสิ้น') {
+        return { color: 'green', textColor: 'white' }
+      } else {
+        return { color: 'grey', textColor: 'black' }
+      }
+    }
+
     return {
       newStockCheck,
       filters,
@@ -135,6 +159,7 @@ export default defineComponent({
       loadStockHistory,
       viewDetails,
       filteredChecks,
+      getStatusColor,
     }
   },
 })
