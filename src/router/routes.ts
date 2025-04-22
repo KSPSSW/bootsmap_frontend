@@ -11,16 +11,16 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: () => import('pages/MainMenuPage.vue') }],
   },
-  // {
-  //   path: '/stock',
-  //   component: () => import('layouts/MainLayout.vue'),
-  //   children: [{ path: '', component: () => import('pages/StockPage.vue') }],
-  // },
   {
     path: '/stock',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/StockCheckPage.vue') }],
+    children: [{ path: '', component: () => import('pages/StockPage.vue') }],
   },
+  // {
+  //   path: '/stock',
+  //   component: () => import('layouts/MainLayout.vue'),
+  //   children: [{ path: '', component: () => import('pages/StockCheckPage.vue') }],
+  // },
   {
     path: '/stock-detail/:id',
     component: () => import('layouts/MainLayout.vue'),

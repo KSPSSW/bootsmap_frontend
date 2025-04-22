@@ -1,13 +1,7 @@
 <!-- eslint-disable vue/no-parsing-error -->
 <template>
   <q-page class="q-pa-md">
-    <!-- Stock Info Section -->
-    <div class="row q-mb-md">
-      <q-chip class="q-mr-sm" color="primary" label="สินค้าทั้งหมด 10" />
-      <q-chip class="q-mr-sm" color="negative" label="สินค้ากลใกล้หมด 2" />
-      <q-chip class="q-mr-sm" color="grey-3" label="สินค้าหมด 0" />
-      <q-chip class="q-mr-sm" color="green" label="อื่น ๆ 0" />
-    </div>
+    <!-- Stock Info Section -->-
 
     <!-- Add Stock Check Section -->
     <q-card class="q-mb-md">
@@ -43,8 +37,21 @@
           outlined
           class="q-mb-sm"
         />
-        <q-date v-model="filters.startDate" label="วันที่เริ่มต้น" dense outlined class="q-mb-sm" />
-        <q-date v-model="filters.endDate" label="วันที่สิ้นสุด" dense outlined class="q-mb-sm" />
+        <q-input
+          v-model="filters.startDate"
+          label="วันที่เริ่มต้น"
+          type="date"
+          dense
+          outlined
+          class="q-mb-sm"
+        />
+        <q-input
+          v-model="filters.endDate"
+          label="วันที่สิ้นสุด"
+          type="date"
+          outlined
+          class="q-mb-sm"
+        />
         <q-btn label="รีเฟรช" color="secondary" class="q-mb-md" @click="loadStockHistory" />
       </q-card-section>
       <q-table :rows="filteredChecks" :columns="columns" row-key="id" class="q-pa-sm">
@@ -62,15 +69,19 @@ import { useRouter } from 'vue-router'
 import { useCheckStockStore } from 'src/stores/checkStockStore'
 import { type CheckStock } from 'src/models'
 import { type QTableColumn } from 'quasar'
+import { useUserStore } from 'src/stores/userStore'
 
 export default defineComponent({
   setup() {
     const stockStore = useCheckStockStore()
     const router = useRouter()
+    const userStore = useUserStore()
+
+    const currentUser = computed(() => userStore.currentUser)
 
     const newStockCheck = ref({
       date: '',
-      checker: '',
+      checker: currentUser.value?.name,
       note: '',
     })
 
