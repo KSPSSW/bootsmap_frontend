@@ -94,23 +94,25 @@ export interface Customer {
   point: number
 }
 
-export interface CheckStockItem {
-  code: string
-  name: string
-  category: string
-  systemQty: number
-  actualQty: number
+export interface StockDetails {
+  id: number
+  productName: string
+  previousQuantity: number
+  newQuantity: number
+  unit: string
   difference: number
-  note: string
+  status: string
+  inventoryitemId: number
+  stockcheckRecordId: number
 }
 
-export interface CheckStock {
+export interface StockCheckRecord {
   id: number
-  date: string
-  checker: string
+  checkDate: string
+  staffName: string
   note: string
-  status: 'กำลังดำเนินการ' | 'เสร็จสิ้น'
-  items: CheckStockItem[]
+  userId: number
+  items: StockDetails[]
 }
 
 export interface Salary {

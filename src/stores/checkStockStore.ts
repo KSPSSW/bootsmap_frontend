@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { CheckStock } from 'src/models'
+import type { StockCheckRecord } from 'src/models'
 
 export const useCheckStockStore = defineStore('checkStock', () => {
-  const stockChecks = ref<CheckStock[]>([])
+  const stockChecks = ref<StockCheckRecord[]>([])
 
-  const addStockCheck = (check: CheckStock) => {
+  const addStockCheck = (check: StockCheckRecord) => {
     stockChecks.value.push(check)
     localStorage.setItem('stockChecks', JSON.stringify(stockChecks.value))
   }
@@ -14,7 +14,7 @@ export const useCheckStockStore = defineStore('checkStock', () => {
     return stockChecks.value.find((check) => check.id === id)
   }
 
-  const updateStockCheck = (id: number, updatedCheck: CheckStock) => {
+  const updateStockCheck = (id: number, updatedCheck: StockCheckRecord) => {
     const index = stockChecks.value.findIndex((check) => check.id === id)
     if (index !== -1) {
       stockChecks.value[index] = updatedCheck

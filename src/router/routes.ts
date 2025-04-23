@@ -14,18 +14,18 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/stock',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/StockPage.vue') }],
+    children: [{ path: '', component: () => import('pages/CheckStockPage.vue') }],
   },
   // {
   //   path: '/stock',
   //   component: () => import('layouts/MainLayout.vue'),
   //   children: [{ path: '', component: () => import('pages/StockCheckPage.vue') }],
   // },
-  {
-    path: '/stock-detail/:id',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/StockDetailPage.vue') }],
-  },
+  // {
+  //   path: '/stock-detail/:id',
+  //   component: () => import('layouts/MainLayout.vue'),
+  //   children: [{ path: '', component: () => import('pages/StockDetailPage.vue') }],
+  // },
   {
     path: '/pos',
     component: () => import('layouts/MainLayout.vue'),
