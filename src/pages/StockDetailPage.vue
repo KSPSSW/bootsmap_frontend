@@ -46,7 +46,6 @@
           @click="completeStockCheck"
           :disable="isCompleted"
         />
-        <q-btn label="ย้อนกลับ" color="primary" class="q-mt-md" @click="goBackToStockPage" />
       </q-card-section>
     </q-card>
   </q-page>
@@ -97,8 +96,7 @@ export default defineComponent({
       { name: 'minStock', label: 'สต็อกขั้นต่ำ', field: 'minStock', align: 'right' },
       { name: 'price', label: 'ราคา', field: 'price', align: 'right' },
       { name: 'supplier', label: 'ผู้จำหน่าย', field: 'supplier', align: 'left' },
-      { name: 'lastOrder', label: 'วันที่สั่งซื้อครั้งล่าสุด', field: 'lastOrder', align: 'left' },
-      { name: 'actualQty', label: 'จำนวนที่นับได้', field: 'actualQty', align: 'right' },
+      { name: 'actualQty', label: 'จำนวนที่นับได้', field: 'actualQty', align: 'center' },
     ]
 
     const updateDifference = (item: CheckStockItem) => {
@@ -138,9 +136,18 @@ export default defineComponent({
       }
     }
 
-    //     function toggleLowStock() {
-    //       showLowStock.value = !showLowStock.value
-    // }
+    const updateSystemQty = async (item: CheckStockItem) => {
+      try {
+        // ส่งคำขอ PATCH ไปยัง API เพื่ออัปเดต systemQty
+        const response = await api.patch(`/inventory-items/${item.code}`, {
+          systemQty: item.actualQty, // อัปเดตค่า systemQty ให้เป็น actualQty ใหม่
+        })
+        console.log('อัปเดตค่า systemQty สำเร็จ:', response.data)
+      } catch (error) {
+        console.error('ไม่สามารถอัปเดต systemQty ได้', error)
+        // คุณสามารถแสดงข้อความแจ้งเตือนหรือทำการจัดการข้อผิดพลาดที่เหมาะสมได้ที่นี่
+      }
+    }
 
     return {
       stockDetail,
@@ -152,6 +159,7 @@ export default defineComponent({
       goBackToStockPage,
       stockItems,
       loadDetail,
+      updateSystemQty,
     }
   },
 })

@@ -1,12 +1,16 @@
-<!-- eslint-disable vue/no-parsing-error -->
 <template>
-  <q-page class="q-pa-md">
-    <!-- Stock Info Section -->-
-
-    <!-- Add Stock Check Section -->
-    <q-card class="q-mb-md">
+  <q-page class="q-pa-md" style="background-color: #f5f5f5">
+    <!-- Stock Info Section -->
+    <q-card
+      class="q-mb-md"
+      style="
+        background-color: #fff1e6;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      "
+    >
       <q-card-section>
-        <div class="text-h6">เพิ่มการเช็คสต็อกใหม่</div>
+        <div class="text-h6" style="color: #6f4f1f">เพิ่มการเช็คสต็อกใหม่</div>
       </q-card-section>
       <q-card-section>
         <q-form @submit.prevent="handleNewStockCheck">
@@ -17,18 +21,39 @@
             dense
             outlined
             required
+            class="q-mb-md"
           />
-          <q-input v-model="newStockCheck.checker" label="ผู้ตรวจสอบ" dense outlined required />
-          <q-input v-model="newStockCheck.note" label="หมายเหตุ" dense outlined />
-          <q-btn label="เริ่มเช็คสต็อก" type="submit" color="primary" class="q-mt-sm" />
+          <q-input
+            v-model="newStockCheck.checker"
+            label="ผู้ตรวจสอบ"
+            dense
+            outlined
+            required
+            class="q-mb-md"
+          />
+          <q-input v-model="newStockCheck.note" label="หมายเหตุ" dense outlined class="q-mb-md" />
+          <q-btn
+            label="เริ่มเช็คสต็อก"
+            type="submit"
+            color="brown"
+            class="q-mt-sm full-width"
+            style="border-radius: 8px"
+          />
         </q-form>
       </q-card-section>
     </q-card>
 
     <!-- Stock History Section -->
-    <q-card>
+    <q-card
+      class="q-mb-md"
+      style="
+        background-color: #fff1e6;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      "
+    >
       <q-card-section>
-        <div class="text-h6">ประวัติการเช็คสต็อก</div>
+        <div class="text-h6" style="color: #6f4f1f">ประวัติการเช็คสต็อก</div>
         <q-select
           v-model="filters.status"
           :options="statusOptions"
@@ -36,6 +61,7 @@
           dense
           outlined
           class="q-mb-sm"
+          style="max-width: 250px"
         />
         <q-input
           v-model="filters.startDate"
@@ -52,7 +78,13 @@
           outlined
           class="q-mb-sm"
         />
-        <q-btn label="รีเฟรช" color="secondary" class="q-mb-md" @click="loadStockHistory" />
+        <q-btn
+          label="รีเฟรช"
+          color="secondary"
+          class="q-mb-md"
+          @click="loadStockHistory"
+          style="border-radius: 8px"
+        />
       </q-card-section>
       <q-table :rows="filteredChecks" :columns="columns" row-key="id" class="q-pa-sm">
         <template v-slot:body-cell-status="props">
@@ -63,13 +95,20 @@
               :text-color="getStatusColor(props.row.status).textColor"
               :label="props.row.status"
               class="q-mb-xs"
+              style="border-radius: 12px; padding: 5px 12px"
             />
           </q-td>
         </template>
 
         <!-- คอลัมน์ปุ่มดูรายละเอียด -->
         <template v-slot:body-cell-actions="props">
-          <q-btn label="ดูรายละเอียด" color="info" @click="viewDetails(props.row.id)" flat />
+          <q-btn
+            label="ดูรายละเอียด"
+            color="info"
+            @click="viewDetails(props.row.id)"
+            flat
+            style="border-radius: 8px"
+          />
         </template>
       </q-table>
     </q-card>
