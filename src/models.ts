@@ -107,12 +107,24 @@ export interface StockDetails {
 }
 
 export interface StockCheckRecord {
+  stockcheckDetails:
+    | StockDetails[]
+    | {
+        id: number
+        productName: string
+        previousQuantity: number
+        newQuantity: number
+        unit: string
+        difference: number
+        status: string
+        inventoryitemId: number
+        stockcheckRecordId: number
+      }[]
   id: number
   checkDate: string
   staffName: string
   note: string
   userId: number
-  items: StockDetails[]
 }
 
 export interface Salary {

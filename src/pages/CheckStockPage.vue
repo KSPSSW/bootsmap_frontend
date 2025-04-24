@@ -38,11 +38,14 @@
               </q-input>
 
               <!-- ช่องใส่ชื่อ -->
-              <q-input
+              <q-select
                 filled
-                v-model="name"
-                label="Name"
-                :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
+                v-model="selectedUser"
+                :options="userList"
+                label="Select User"
+                emit-value
+                map-options
+                :rules="[(val) => !!val || 'Please select a user']"
               />
 
               <!-- ช่องใส่หมายเหตุ -->
@@ -55,7 +58,73 @@
               />
 
               <!-- ปุ่ม Check Stock -->
-              <q-btn label="Check Stock" type="submit" color="brown" @click="goToCheckStockPage" />
+              <q-btn
+                label="Check Stock"
+                type="submit"
+                color="brown"
+                @click="CheckStock"
+                :disable="isCheckStockDisabled"
+              />
+              <q-dialog>
+                <div v-for="(item, index) in stockItems" :key="index" class="q-gutter-md q-mb-md">
+                  <q-select
+                    v-model="item.inventoryItemId"
+                    :options="inventoryItems.map((i) => ({ label: i.name, value: i.id }))"
+                    label="Select Item"
+                    @update:model-value="
+                      (val) => {
+                        const found = inventoryItems.find((i) => i.id === val)
+                        item.previousQuantity = found?.quantity ?? 0
+                      }
+                    "
+                    emit-value
+                    map-options
+                    filled
+                    dense
+                  />
+
+                  <q-input
+                    v-model="item.previousQuantity"
+                    label="Previous Quantity"
+                    filled
+                    dense
+                    readonly
+                  />
+
+                  <q-input
+                    v-model.number="item.newQuantity"
+                    label="New Quantity"
+                    type="number"
+                    filled
+                    dense
+                  />
+
+                  <q-btn
+                    icon="delete"
+                    color="negative"
+                    dense
+                    flat
+                    @click="stockItems.splice(index, 1)"
+                  />
+
+                  <q-btn
+                    v-if="isCheckStocking"
+                    label="Add Item"
+                    icon="add"
+                    flat
+                    color="primary"
+                    @click="
+                      stockItems.push({
+                        inventoryItemId: null,
+                        previousQuantity: 0,
+                        newQuantity: 0,
+                      })
+                    "
+                  />
+                </div>
+              </q-dialog>
+
+              <q-btn label="Save" color="positive" @click="saveStockCheckUpdate" />
             </q-form>
           </q-card>
         </q-tab-panel>
@@ -115,7 +184,7 @@
 
                 <template v-slot:body-cell-items="{ row }">
                   <td class="q-td" style="text-align: center">
-                    <q-table :rows="row.items" :columns="itemsColumns" row-key="id" dense flat />
+                    <q-table :rows="row.items" :column="itemsColumns" row-key="id" dense flat />
                   </td>
                 </template>
               </q-table>
@@ -136,7 +205,7 @@
           <div>สถานะ: {{ selectedRecord?.status }}</div>
 
           <!-- แสดงข้อมูลสินค้าใน StockCheckDetail -->
-          <q-table :columns="itemsColumns" :rows="selectedItems" row-key="id" dense flat>
+          <q-table :column="itemsColumns" :rows="selectedItems" row-key="id" dense flat>
             <template v-slot:body-cell-productName="{ row }">
               <td class="q-td" style="text-align: left">{{ row.productName }}</td>
             </template>
@@ -182,10 +251,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
-import type { StockCheckRecord, StockDetails } from 'src/models'
+import type { StockCheckRecord, StockDetails, User } from 'src/models'
 import { type QTableColumn } from 'quasar'
-import { useRouter } from 'vue-router'
-
 // กำหนดตัวแปรสำหรับข้อมูล Stock
 const selectedDate = ref('')
 const selectedYear = ref<number | null>(null)
@@ -198,7 +265,11 @@ const searchQuery = ref('') // ตัวแปรสำหรับการค�
 const dialog = ref(false)
 const selectedRecord = ref()
 const selectedItems = ref<StockDetails[]>([])
-const router = useRouter()
+const selectedUser = ref<number | null>(null)
+const userList = ref<UserOption[]>([])
+const inventoryItems = ref<{ id: number; name: string; quantity: number }[]>([])
+const stockItems = ref([{ inventoryItemId: null, previousQuantity: 0, newQuantity: 0 }])
+const isCheckStocking = ref(false)
 
 const years = ref([2023, 2024, 2025]) // รายชื่อปี
 const months = ref([
@@ -217,6 +288,32 @@ const months = ref([
 ])
 
 const history = ref<StockCheckRecord[]>([]) // รายการข้อมูลเช็คสต็อก
+
+interface UserOption {
+  label: string
+  value: number
+}
+
+async function loadInventoryItems() {
+  try {
+    const res = await axios.get('http://localhost:5002/inventory-items') // เปลี่ยน URL ให้ตรงระบบ
+    inventoryItems.value = res.data
+  } catch (error) {
+    console.error('Error loading inventory items:', error)
+  }
+}
+
+async function loadUsers() {
+  try {
+    const res = await axios.get('http://localhost:5002/users') // เปลี่ยนให้ตรงกับ API จริง
+    userList.value = res.data.map((u: User) => ({
+      label: u.name,
+      value: u.id,
+    }))
+  } catch (err) {
+    console.error('Error loading user list:', err)
+  }
+}
 
 // กำหนด column สำหรับ StockDetail
 const itemsColumns = [
@@ -242,7 +339,36 @@ const columns: QTableColumn[] = [
 
 onMounted(() => {
   loadHistory() // เรียกใช้ฟังก์ชัน loadHistory
+  loadUsers()
+  loadInventoryItems()
 })
+
+async function saveStockCheckUpdate() {
+  if (!selectedRecord.value) return
+
+  const payload = {
+    checkDate: selectedRecord.value.checkDate,
+    staffName: selectedRecord.value.staffName,
+    note: selectedRecord.value.note,
+    userId: selectedRecord.value.userId,
+    items: selectedItems.value.map((item) => ({
+      inventoryItemId: item.inventoryitemId,
+      newQuantity: item.newQuantity,
+    })),
+  }
+
+  try {
+    const res = await axios.patch(
+      `http://localhost:5002/stockcheck-record/${selectedRecord.value.id}`,
+      payload,
+    )
+    console.log('Update success', res.data)
+    dialog.value = false
+    await loadHistory() // โหลดข้อมูลใหม่
+  } catch (err) {
+    console.error('Update failed', err)
+  }
+}
 
 // ดึงข้อมูลจาก API เมื่อหน้าโหลด
 async function loadHistory() {
@@ -254,8 +380,20 @@ async function loadHistory() {
   }
 }
 
-function goToCheckStockPage() {
-  router.push({ name: 'checkStock' })
+const isCheckStockDisabled = computed(() => {
+  return (
+    !selectedDate.value || // ไม่ได้เลือกวันที่
+    !selectedUser.value || // ไม่ได้เลือกชื่อผู้ใช้
+    note.value.trim() === '' // ไม่ได้กรอกหมายเหตุ
+  )
+})
+
+function CheckStock() {
+  dialog.value = true
+  if (!isCheckStockDisabled.value) {
+    isCheckStocking.value = true
+    // คุณอาจใส่โค้ดเตรียมค่าอื่นๆ ได้ตรงนี้
+  }
 }
 
 // ฟังก์ชันกรองประวัติการเช็คสต็อก

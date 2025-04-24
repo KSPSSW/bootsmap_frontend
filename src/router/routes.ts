@@ -16,16 +16,6 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: () => import('pages/CheckStockPage.vue') }],
   },
-  // {
-  //   path: '/stock',
-  //   component: () => import('layouts/MainLayout.vue'),
-  //   children: [{ path: '', component: () => import('pages/StockCheckPage.vue') }],
-  // },
-  // {
-  //   path: '/stock-detail/:id',
-  //   component: () => import('layouts/MainLayout.vue'),
-  //   children: [{ path: '', component: () => import('pages/StockDetailPage.vue') }],
-  // },
   {
     path: '/pos',
     component: () => import('layouts/MainLayout.vue'),
@@ -70,18 +60,6 @@ const routes: RouteRecordRaw[] = [
     path: '/login',
     component: () => import('layouts/FullScreen.vue'),
     children: [{ path: '', component: () => import('pages/LoginPage.vue') }],
-  },
-  {
-    path: '/stock',
-    name: 'StockPage',
-    component: () => import('pages/StockPage.vue'),
-    children: [
-      {
-        path: 'detail/:id',
-        name: 'StockDetailPage',
-        component: () => import('pages/StockDetailPage.vue'),
-      },
-    ],
   },
   {
     path: '/inventory',
